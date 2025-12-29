@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cerita Kita</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
+body{height:100vh;overflow:hidden;color:#fff;background:#000}
+
+/* BACKGROUND */
+#bg{
+  position:fixed;inset:0;
+  background:url('bg-game.jpg') center/cover no-repeat;
+  filter:blur(6px) brightness(.6);
+  transform:scale(1.15);
+  z-index:-3
+}
+#overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.4);
+  z-index:-2
+}
+
+/* MOBILE OPTIMIZATION */
+@media(max-width:480px){
+  h2{font-size:22px}
+  h3{font-size:18px}
+  p{font-size:14px}
+  .emotion-box{font-size:15px}
+}
+
+/* BUBBLES */
+.bubble{
+  position:fixed;
+  bottom:-120px;
+  border-radius:50%;
+  background:rgba(255,255,255,.22);
+  animation:floatUp linear infinite;
+  z-index:-1
+}
+@keyframes floatUp{
+  to{transform:translateY(-120vh);opacity:0}
+}
+
+/* HEART RAIN */
+.heart-rain{
+  position:fixed;
+  top:-10vh;
+  pointer-events:none;
+  animation:heartFall linear infinite;
+  z-index:-1
+}
+@keyframes heartFall{
+  to{transform:translateY(120vh) rotate(360deg);opacity:0}
+}
+
+/* START */
+#start{
+  position:fixed;inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,.75);
+  z-index:10;
+  cursor:pointer
+}
+#start span{
+  font-size:48px;
+  animation:pop 1s ease-in-out infinite;
+}
+@keyframes pop{
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.2);}
+}
+
+/* CONTAINER */
+.container{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:20px;
+  opacity:1;
+  transition:opacity .8s, transform .8s;
+}
+.hidden{display:none}
+
+/* STICKER */
+.stiker{
+  width:120px;
+  margin-bottom:14px;
+  animation:float 4s ease-in-out infinite
+}
+@keyframes float{
+  50%{transform:translateY(-12px)}
+}
+
+/* HEART CLICK */
+.heart{
+  font-size:56px;
+  cursor:pointer;
+  animation:pulse 1.2s infinite
+}
+@keyframes pulse{
+  50%{transform:scale(1.15)}
+}
+.counter{font-size:13px;opacity:.7}
+
+/* MEMORY GAME */
+.game{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:repeat(4,70px);
+  gap:14px
+}
+.card{
+  width:70px;height:70px;
+  border-radius:18px;
+  background:linear-gradient(145deg,rgba(255,255,255,.35),rgba(255,255,255,.15));
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.4);
+  box-shadow:0 8px 18px rgba(0,0,0,.3);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  cursor:pointer;
+  transition:.5s;
+  transform-style: preserve-3d;
+}
+.card.flipped{
+  background:rgba(255,255,255,.6);
+  transform:rotateY(180deg);
+}
+
+/* STORY AREA */
+.story-area{
+  width:100%;
+  max-width:360px;
+  min-height:420px;
+  display:flex;
+  flex-direction:column;
+  gap:16px
+}
+
+/* POSITIONS */
+.story-left{align-self:flex-start;text-align:left;animation:slideLeft 1.5s forwards}
+.story-center{align-self:center;text-align:center;animation:fadeUp 1.5s forwards}
+.story-right{align-self:flex-end;text-align:right;animation:slideRight 1.5s forwards}
+
+@keyframes slideLeft{
+  from{opacity:0;transform:translateX(-40px)}
+  to{opacity:1}
+}
+@keyframes slideRight{
+  from{opacity:0;transform:translateX(40px)}
+  to{opacity:1}
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1}
+}
+
+/* EMOTION BOX */
+.emotion-box{
+  background:rgba(0,0,0,.48);
+  backdrop-filter:blur(12px);
+  border-radius:18px;
+  padding:16px 18px;
+  box-shadow:0 18px 45px rgba(0,0,0,.4);
+  line-height:1.55
+}
+.emotion-box b{color:#ffd6e7}
+.emotion-box span{color:#ffb6c1}
+
+/* FINAL LINE */
+.final-line{
+  font-size:20px;
+  text-align:center;
+  animation:fadeUp 2.5s forwards
+}
+
+/* CONFETTI */
+.confetti{
+  position:fixed;
+  width:8px;height:8px;
+  animation:confettiFall linear infinite;
+  z-index:5
+}
+@keyframes confettiFall{
+  to{transform:translateY(120vh) rotate(720deg);opacity:0}
+}
+
+/* POPUP */
+#popup{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.65);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:20;
+  opacity:0;
+  transition:opacity 1s;
+}
+.popupBox{
+  background:#fff;
+  color:#000;
+  padding:22px 26px;
+  border-radius:22px;
+  text-align:center
+}
+.popupBox button{
+  margin:10px;
+  padding:10px 24px;
+  border:none;
+  border-radius:20px;
+  background:pink;
+  cursor:pointer
+}
+
+/* FADE OUT SCENE */
+.fadeOut{
+  opacity:0;
+  transform:scale(0.95);
+}
+</style>
+</head>
+
+<body>
+
+<div id="bg"></div>
+<div id="overlay"></div>
+<audio id="music" src="lagu.mp3" loop></audio>
+
+<div id="start">
+  <span>❤️</span>
+  <p>Sentuh untuk mulai</p>
+</div>
+
+<div class="container hidden" id="scene1">
+  <img class="stiker" src="https://feeldreams.github.io/weee.gif">
+  <h2>Halo kamu 🤍</h2>
+  <p>Masih ingat cerita kita?</p>
+  <div class="heart" id="heart">❤️</div>
+  <div class="counter" id="counter">Klik 3x ya</div>
+</div>
+
+<div class="container hidden" id="scene2">
+  <img class="stiker" src="https://feeldreams.github.io/pandapanah.gif">
+  <h3>Tantangan kecil ✨</h3>
+  <p>Samakan semua kartunya</p>
+  <div class="game" id="game"></div>
+</div>
+
+<div class="container hidden" id="scene3">
+  <img id="emoji" class="stiker">
+  <div id="textBox" class="story-area"></div>
+</div>
+
+<div id="popup">
+  <div class="popupBox">
+    <h3>Lanjut ke mana? 🤍</h3>
+    <button onclick="go('surat.html')">💌 Surat</button>
+    <button onclick="go('galeri.html')">🖼 Galeri</button>
+  </div>
+</div>
+
+<script>
+/* BACKGROUND EFFECTS */
+for(let i=0;i<16;i++){
+  const b=document.createElement("div");
+  b.className="bubble";
+  b.style.left=Math.random()*100+"vw";
+  b.style.width=b.style.height=12+Math.random()*18+"px";
+  b.style.animationDuration=6+Math.random()*6+"s";
+  document.body.appendChild(b);
+}
+
+function hearts(n=4){
+  for(let i=0;i<n;i++){
+    const h=document.createElement("div");
+    h.className="heart-rain";
+    h.innerHTML="💖";
+    h.style.left=Math.random()*100+"vw";
+    h.style.fontSize=14+Math.random()*18+"px";
+    h.style.animationDuration=3+Math.random()*3+"s";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),6000);
+  }
+}
+document.addEventListener("click",()=>hearts(3));
+
+start.onclick=()=>{
+  music.volume=.6;
+  music.play();
+  start.style.display="none";
+  scene1.classList.remove("hidden");
+};
+
+/* HEART CLICK */
+let klik=0;
+heart.onclick=()=>{
+  klik++;
+  counter.innerText=`Klik ${klik}/3`;
+  if(klik>=3){
+    scene1.classList.add("fadeOut");
+    setTimeout(()=>{scene1.classList.add("hidden"); scene2.classList.remove("hidden");},800);
+  }
+};
+
+/* GAME */
+const emojis=['❤️','💐','🥰','😍','🌸','💖','✨','🌙','❤️','💐','🥰','😍','🌸','💖','✨','🌙'];
+let first=null,lock=false,match=0;
+emojis.sort(()=>0.5-Math.random());
+emojis.forEach(e=>{
+  const c=document.createElement("div");
+  c.className="card";
+  c.onclick=()=>{
+    if(lock||c===first||c.classList.contains("flipped"))return;
+    c.textContent=e;c.classList.add("flipped");
+    if(!first){first=c;return;}
+    lock=true;
+    if(first.textContent===e){
+      match++;first=null;lock=false;
+      if(match===8) selesai();
+    }else{
+      setTimeout(()=>{
+        c.textContent="";first.textContent="";
+        c.classList.remove("flipped");first.classList.remove("flipped");
+        first=null;lock=false;
+      },900);
+    }
+  };
+  game.appendChild(c);
+});
+
+/* STORY */
+function selesai(){
+  scene2.classList.add("fadeOut");
+  setTimeout(()=>{
+    scene2.classList.add("hidden"); scene3.classList.remove("hidden"); hearts(18);
+  },800);
+
+  const story=[
+    {p:"story-left",e:"https://feeldreams.github.io/weee.gif",t:"Aku sempat ragu…<br>apa kamu bakal benar-benar lanjut 🤍"},
+    {p:"story-center",e:"https://feeldreams.github.io/pandapanah.gif",t:"Tapi kamu tetap di sini,<br>pelan, tapi pasti 🌱"},
+    {p:"story-right",e:"https://feeldreams.github.io/pusn.gif",t:"Dan jujur aja,<br><b>itu bikin aku merasa dihargai</b> 🫶"},
+    {p:"story-left",e:"https://feeldreams.github.io/g5.gif",t:"Bukan karena gamenya,<br>tapi karena niat kamu 💖"}
+  ];
+
+  let i=0;
+  function show(){
+    if(i>=story.length){
+      ending();
+      return;
+    }
+    emoji.src=story[i].e;
+    const box=document.createElement("div");
+    box.className="emotion-box "+story[i].p;
+    box.innerHTML=story[i].t;
+    textBox.appendChild(box);
+    i++;
+    setTimeout(show,4500);
+  }
+  show();
+}
+
+/* ENDING NGENA */
+function ending(){
+  music.volume=.3;
+  overlay.style.background="rgba(0,0,0,.6)";
+  emoji.style.display="none";
+
+  const last=document.createElement("div");
+  last.className="emotion-box final-line";
+  last.innerHTML="Kalau kamu baca sampai sini…<br><br><b>berarti aku penting buat kamu</b> 🤍";
+  textBox.appendChild(last);
+
+  confetti();
+  setTimeout(()=>{
+    popup.style.display="flex";
+    popup.style.opacity=1;
+  },4200);
+}
+
+/* CONFETTI */
+function confetti(){
+  for(let i=0;i<50;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=`hsl(${Math.random()*360},80%,70%)`;
+    c.style.animationDuration=3+Math.random()*3+"s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),6000);
+  }
+}
+
+function go(p){window.location.href=p}
+</script>
+
+</body>
+</html>

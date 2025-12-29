@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galeri Kenangan</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@400&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  height:100vh;
+  overflow:hidden;
+  font-family:'Inter',sans-serif;
+  background:
+    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
+    url("bg-gallery.jpg") center/cover no-repeat;
+}
+
+/* FILM GRAIN */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+}
+
+/* STORY */
+.story{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.box{
+  width:92%;
+  max-width:430px;
+  height:88%;
+  border-radius:22px;
+  overflow:hidden;
+  position:relative;
+  background:#000;
+}
+
+/* IMAGE */
+.slide{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  transition:filter 2s ease;
+}
+
+/* TEXT */
+.text{
+  position:absolute;
+  bottom:22%;
+  width:100%;
+  padding:0 22px;
+  text-align:center;
+  font-family:'Playfair Display',serif;
+  font-size:20px;
+  color:#fff;
+  text-shadow:0 4px 14px rgba(0,0,0,.9);
+}
+
+/* ENDING */
+.controls{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:20px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 2s ease;
+}
+
+.controls.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.controls button{
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  border:none;
+  background:#ff6b81;
+  color:white;
+  font-size:26px;
+  cursor:pointer;
+}
+
+@media(max-width:480px){
+  .text{font-size:18px}
+}
+</style>
+</head>
+
+<body>
+
+<audio id="music" preload="auto">
+  <source src="gallery-music.mp3" type="audio/mpeg">
+</audio>
+
+<div class="story">
+  <div class="box">
+    <div class="slide" id="slide"></div>
+    <div class="text" id="text"></div>
+
+    <!-- ENDING -->
+    <div class="controls" id="end">
+      <button onclick="restart()">❤️</button>
+      <button onclick="goMenu()">🏠</button>
+      <button onclick="secretEnding()">🌙</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* DATA */
+const slides=[
+ {img:"photo1.jpg",text:"Berawal dari sebuah  Pertemuan yang  tidak  disengaja &  Menjadi  Sebuah  Cerita 😊"},
+ {img:"photo2.jpg",text:"Setiap  Hari  yang  Penuh  Warna 💕"},
+ {img:"photo3.jpg",text:"Dan  Selalu  Bermakna 💕"},
+ {img:"photo4.jpg",text:"Cerita Tentang Kita 💕"},
+ {img:"photo5.jpg",text:"Dari Obrolan Kecil Penuh Canda dan Tawa 💕"},
+ {img:"photo6.jpg",text:"Membuat Setiap Moment Jadi Berharga 💕"},
+ {img:"photo7.jpg",text:"Kita Akhirnya Sampai Disini"},
+ {img:"photo8.jpg",text:"Untuk Mengenang Segalanya"},
+ {img:"photo9.jpg",text:"Terima Kasih Untuk Semua nya ❤️"},
+ {img:"photo10.jpg",text:"Akan Selalu Kuingat Kamu Selamanya ❤️"}
+];
+
+let i=0;
+const slide=document.getElementById("slide");
+const text=document.getElementById("text");
+const end=document.getElementById("end");
+
+/* TYPE TEXT */
+function typeText(sentence){
+  text.innerHTML="";
+  const words=sentence.split(" ");
+  let w=0;
+  const t=setInterval(()=>{
+    text.innerHTML+=words[w]+" ";
+    w++;
+    if(w>=words.length) clearInterval(t);
+  },420);
+}
+
+/* SHOW SLIDE */
+function showSlide(){
+  if(i>=slides.length){
+    end.classList.add("show");
+    fadeOutMusic();
+    return;
+  }
+
+  slide.style.filter="brightness(.7)";
+  setTimeout(()=>{
+    slide.style.backgroundImage=`url(${slides[i].img})`;
+    slide.style.filter="brightness(1)";
+    typeText(slides[i].text);
+    i++;
+  },1200);
+}
+
+/* START */
+let interval;
+function start(){
+  showSlide();
+  interval=setInterval(showSlide,9000);
+}
+
+/* MUSIC */
+const music=document.getElementById("music");
+music.volume=0;
+
+document.body.addEventListener("click",()=>{
+  music.play();
+  let v=0;
+  const f=setInterval(()=>{
+    if(v<0.5){v+=0.02;music.volume=v}else clearInterval(f);
+  },200);
+},{once:true});
+
+/* FADE MUSIC */
+function fadeOutMusic(){
+  let v=music.volume;
+  const o=setInterval(()=>{
+    if(v>0.02){v-=0.02;music.volume=v}else clearInterval(o);
+  },300);
+}
+
+/* NAV */
+function restart(){location.reload()}
+function goMenu(){location.href="index.html"}
+
+/* SECRET ENDING */
+function secretEnding(){
+  alert("🌙 Ending Rahasia\n\nTerima kasih sudah sampai di akhir.\nKenangan ini akan selalu ada 🤍");
+}
+
+/* FALLBACK START (ANTI STUCK) */
+start();
+</script>
+
+</body>
+</html>
